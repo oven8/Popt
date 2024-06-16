@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Portfolio Optimizer</title>
+</head>
+<body>
+    <div>
+        <h1>Portfolio Optimizer</h1>
+        <p>Note that the optimization takes time so be patient! The default bond yield is taken to be 7.095%.</p>
+        <form id="optimize-form">
+            <input type="text" id="tickers" name="tickers" size="35" placeholder="Enter stock tickers separated by commas">
+            <input type="number" id="bond_yield" name="bond_yield" step="any" size="30" placeholder="Enter the 10 year bond yield">
+            <button type="submit">Optimize</button>
+        </form>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        document.getElementById('optimize-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const tickers = document.getElementById('tickers').value;
+            const bond_yield_value = document.getElementById("bond_yield").value
+            const bond_yield = bond_yield_value ? parseFloat(bond_yield_value) : null;
+            let tickersArray = tickers ? tickers.split(',').map(t => t.trim()) : null;
+            fetch('/optimize', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ tickers: tickersArray , bond_yield : bond_yield}),
+            })
+            .then(response => response.json())
+            .then(data => {
+                let resultDiv = document.getElementById('results');
+                resultDiv.innerHTML = '<h2>Optimized Weights</h2>';
+                resultDiv.innerHTML += `<p>The bond yield is taken as: ${data.bond_yield}%</p>`;
+                data.results.forEach(item => {
+                    resultDiv.innerHTML += `<p>${item.name} (${item.ticker}): ${(item.weight * 100).toFixed(2)}%</p>`;
+                });
+            });
+        });
+    </script>
+</body>
+</html>
