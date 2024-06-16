@@ -24,10 +24,6 @@ def calculate_optimal_weights(bond_yield,tickers=None):
 
     mu = mean_historical_return(df[period-20*2:period])
     S = CovarianceShrinkage(df[period-20*2:period]).ledoit_wolf(shrinkage_target='single_factor')
-    
-    # Implement your optimization logic here
-    # Placeholder for optimization algorithm
-
 
     ef = EfficientFrontier(mu, S)
     weights = ef.max_sharpe(risk_free_rate=bond_yield)
