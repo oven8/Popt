@@ -4,6 +4,18 @@ import pandas as pd
 from pypfopt.expected_returns import mean_historical_return
 from pypfopt.risk_models import CovarianceShrinkage
 from pypfopt.efficient_frontier import EfficientFrontier
+import requests
+from bs4 import BeautifulSoup
+
+def current_bond_yield():
+    url = "https://www.worldgovernmentbonds.com/bond-historical-data/india/10-years/"
+    response = requests.get(url)
+    soup = BeautifulSoup(response.content, "html.parser")
+
+    # Find the yield value
+    yield_element = soup.find("div",{"class":"w3-cell"}).get_text()
+    bond_yield = float(yield_element.strip()[:-1])/100
+    return bond_yield
 
 def calculate_optimal_weights(bond_yield,tickers=None):
     MF = Mftool()

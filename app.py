@@ -1,16 +1,16 @@
 from flask import Flask, render_template, request, jsonify
-from optimizer import calculate_optimal_weights, ticker_to_name
+from optimizer import calculate_optimal_weights, ticker_to_name, current_bond_yield
 
 app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', CBR=round(current_bond_yield()*100,4))
 
 @app.route('/optimize', methods=['POST'])
 def optimize():
     tickers = request.json.get('tickers', None)
-    bond_yield = request.json.get('bond_yield') or 7.095
+    bond_yield = request.json.get('bond_yield') or round(current_bond_yield()*100,4)
     print(bond_yield)
     weights = calculate_optimal_weights(bond_yield/100,tickers=tickers)
     names = ticker_to_name(tickers=tickers)
